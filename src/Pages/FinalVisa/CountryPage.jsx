@@ -6,9 +6,13 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Dialog } from "primereact/dialog";
 import { ToastContainer, toast } from "react-toastify";
+import Swal from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+// import '../CSS/Country.css'
 
 const CountryPage = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
   const [countries, setCountries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -17,16 +21,25 @@ const CountryPage = () => {
   const [formData, setFormData] = useState({ countryName: "" });
   const [selectedId, setSelectedId] = useState(null);
 
-  const API_URL = "http://localhost:5000/api/countries";
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!localStorage.getItem("FinalVisaId")) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  const FinalVisaId = localStorage.getItem("FinalVisaId");
 
   // Fetch all countries
   const fetchCountries = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(API_URL);
-      setCountries(res.data.data);
+      const res = await axios.get(`${API_URL}/api/countries`);
+      setCountries(res.data.data || []);
     } catch (err) {
       toast.error("Error fetching countries");
+      setCountries([]);
     } finally {
       setLoading(false);
     }
@@ -59,11 +72,21 @@ const CountryPage = () => {
   // Submit form (add or edit)
   const handleSubmit = async () => {
     try {
+      if (!FinalVisaId) {
+        toast.error("Admin ID not found in localStorage");
+        return;
+      }
+
+      const payload = {
+        ...formData,
+        countryAddedBy: FinalVisaId,
+      };
+
       if (isEdit) {
-        await axios.put(`${API_URL}/${selectedId}`, formData);
+        await axios.put(`${API_URL}/api/countries/${selectedId}`, payload);
         toast.success("Country updated successfully");
       } else {
-        await axios.post(API_URL, formData);
+        await axios.post(`${API_URL}/api/countries`, payload);
         toast.success("Country added successfully");
       }
       setDialogVisible(false);
@@ -73,94 +96,176 @@ const CountryPage = () => {
     }
   };
 
-  // Delete country
+  // Delete country with confirmation
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this country?")) {
-      try {
-        await axios.delete(`${API_URL}/${id}`);
-        toast.success("Country deleted successfully");
-        fetchCountries();
-      } catch (err) {
-        toast.error("Error deleting country");
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This country will be deleted permanently!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`${API_URL}/api/countries/${id}`);
+          toast.success("Country deleted successfully");
+          fetchCountries();
+        } catch (err) {
+          console.error(err);
+          toast.error("Error deleting country");
+        }
       }
-    }
+    });
   };
 
-  // Action buttons
+  // Action buttons template
   const actionTemplate = (row) => (
-    <div className="flex gap-2">
+    <div className="country-action-buttons">
       <Button
         icon="pi pi-pencil"
-        className="p-button-rounded p-button-warning"
+        className="country-edit-btn p-button-rounded"
         onClick={() => openEditDialog(row)}
       />
       <Button
         icon="pi pi-trash"
-        className="p-button-rounded p-button-danger"
+        className="country-delete-btn p-button-rounded"
         onClick={() => handleDelete(row._id)}
       />
     </div>
   );
 
   return (
-    <div className="p-6">
-      <ToastContainer />
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Country Management</h2>
-        <Button label="Add Country" icon="pi pi-plus" onClick={openAddDialog} />
+    <div className="country-page-container">
+      <ToastContainer position="top-right" className="country-toast-container" />
+
+      {/* Header Section */}
+      <div className="country-header-section">
+        <div className="country-header-content">
+          <div className="country-title-section">
+            <i className="pi pi-globe country-header-icon"></i>
+            <div>
+              <h1 className="country-page-title">Country Management</h1>
+              <p className="country-page-subtitle">Manage and organize countries efficiently</p>
+            </div>
+          </div>
+          <Button
+            label="Add New Country"
+            icon="pi pi-plus"
+            className="country-add-btn"
+            onClick={openAddDialog}
+          />
+        </div>
       </div>
 
-      <span className="p-input-icon-left mb-3">
-        <i className="pi pi-search" />
-        <InputText
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search countries"
-        />
-      </span>
+      {/* Search and Filters Section */}
+      <div className="country-controls-section">
+        <div className="country-search-container">
+          <span className="country-search-wrapper p-input-icon-left">
+            <i className="pi pi-search country-search-icon" />
+            <InputText
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Search countries..."
+              className="country-search-input"
+            />
+          </span>
+        </div>
 
-      <DataTable
-        value={countries}
-        paginator
-        rows={5}
-        loading={loading}
-        globalFilter={globalFilter}
-        emptyMessage="No countries found"
-      >
-        <Column field="countryName" header="Country Name" sortable />
-        <Column
-          body={(row) => new Date(row.createdAt).toLocaleString()}
-          header="Created At"
-          sortable
-        />
-        <Column body={actionTemplate} header="Actions" />
-      </DataTable>
+        <div className="country-stats-container">
+          <div className="country-stat-card">
+            <span className="country-stat-number">{countries?.length || 0}</span>
+            <span className="country-stat-label">Total Countries</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Data Table Section */}
+      <div className="country-table-container">
+        <DataTable
+          value={countries || []}
+          paginator
+          rows={10}
+          loading={loading}
+          globalFilter={globalFilter}
+          emptyMessage="No countries found"
+          className="country-datatable"
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        >
+          <Column
+            field="countryName"
+            header="Country Name"
+            className="country-name-column"
+            headerClassName="country-header-cell"
+          />
+          <Column
+            field="countryAddedBy.role"
+            header="Added By"
+            className="country-added-by-column"
+            headerClassName="country-header-cell"
+          />
+          <Column
+            body={(row) => (
+              <span className="country-date-cell">
+                {new Date(row.createdAt).toLocaleString()}
+              </span>
+            )}
+            header="Created At"
+            className="country-date-column"
+            headerClassName="country-header-cell"
+          />
+          <Column
+            body={actionTemplate}
+            header="Actions"
+            className="country-actions-column"
+            headerClassName="country-header-cell"
+          />
+        </DataTable>
+      </div>
 
       {/* Modal Dialog */}
       <Dialog
-        header={isEdit ? "Edit Country" : "Add Country"}
+        header={
+          <div className="country-dialog-header">
+            <i className={`pi ${isEdit ? "pi-pencil" : "pi-plus"} country-dialog-icon`}></i>
+            <span>{isEdit ? "Edit Country" : "Add New Country"}</span>
+          </div>
+        }
         visible={dialogVisible}
-        style={{ width: "400px" }}
+        className="country-dialog"
         onHide={() => setDialogVisible(false)}
+        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+        style={{ width: "450px" }}
       >
-        <div className="p-fluid">
-          <div className="field">
-            <label htmlFor="countryName">Country Name</label>
+        <div className="country-form-container p-fluid">
+          <div className="country-form-field">
+            <label htmlFor="countryName" className="country-form-label">
+              Country Name <span className="country-required">*</span>
+            </label>
             <InputText
               id="countryName"
               name="countryName"
               value={formData.countryName}
               onChange={handleChange}
               required
+              className="country-form-input"
+              placeholder="Enter country name"
             />
           </div>
-          <div className="flex justify-end mt-3 gap-2">
+
+          <div className="country-form-actions">
             <Button
               label="Cancel"
-              className="p-button-text"
+              className="country-cancel-btn p-button-text"
               onClick={() => setDialogVisible(false)}
             />
-            <Button label={isEdit ? "Update" : "Save"} onClick={handleSubmit} />
+            <Button
+              label={isEdit ? "Update Country" : "Save Country"}
+              className="country-save-btn"
+              onClick={handleSubmit}
+              disabled={!formData.countryName.trim()}
+            />
           </div>
         </div>
       </Dialog>

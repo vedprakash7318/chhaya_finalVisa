@@ -1,66 +1,39 @@
-import React, { useState } from 'react';
-import './StyleCss/Sidebar.css';
-import {
-  FaHome, FaImage, FaVideo, FaCubes, FaCog, FaUserPlus, FaQuestion,
-  FaChevronDown, FaChevronRight, FaFilm, FaVideoSlash, FaYoutube
-} from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import "./StyleCss/Sidebar.css";
+import { FaHome, FaCubes, FaBuilding } from "react-icons/fa";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Sidebar({ isOpen }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [videoDropdownOpen, setVideoDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const menu = [
-    { icon: <FaHome />, label: 'Dashboard', path: '/dashboard' },
-    { icon: <FaCubes />, label: 'Country', path: '/country' },
-    { icon: <FaCubes />, label: 'Jobs', path: '/jobs' },
+    { icon: <FaHome />, label: "Dashboard", path: "/dashboard" },
+    { icon: <FaCubes />, label: "Leads", path: "/leads" },
+    { icon: <FaBuilding />, label: "Total Offices", path: "/office" },
+    { icon: <FaBuilding />, label: "Country", path: "/country" },
   ];
 
-  const handleItemClick = (item) => {
-    if (item.dropdown) {
-      setVideoDropdownOpen(!videoDropdownOpen);
-    } else if (item.path) {
-      navigate(item.path);
-    }
+  const handleItemClick = (path) => {
+    navigate(path);
   };
 
   return (
-    <div
-      className={`admin-sidebar ${isOpen ? 'open' : 'collapsed'}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className={`admin-sidebar ${isOpen ? "open" : "collapsed"}`}>
       <ul>
-        {menu.map((item, i) => (
-          <React.Fragment key={i}>
-            <li onClick={() => handleItemClick(item)}>
+        {menu.map((item, i) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <li
+              key={i}
+              className={`sidebar-item ${isActive ? "active" : ""}`}
+              onClick={() => handleItemClick(item.path)}
+            >
               <span className="admin-icon">{item.icon}</span>
               <span className="admin-label">{item.label}</span>
-              {item.dropdown && (
-                <span className="dropdown-arrow">
-                  {videoDropdownOpen ? <FaChevronDown /> : <FaChevronRight />}
-                </span>
-              )}
             </li>
-
-            {/* Dropdown Submenu */}
-            {item.dropdown && videoDropdownOpen && (
-              <ul className="dropdown-menu open">
-                {item.dropdown.map((subItem, subIndex) => (
-                  <li
-                    key={subIndex}
-                    className="dropdown-item"
-                    onClick={() => navigate(subItem.path)}
-                  >
-                    <span className="admin-icon">{subItem.icon}</span>
-                    <span className="admin-label">{subItem.label}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </React.Fragment>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );

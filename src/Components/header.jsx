@@ -32,14 +32,7 @@ const Header = ({ toggleSidebar }) => {
         </div>
       </div>
       <div className="navbar-right">
-        <div className="nav-icon">
-          <FaBell />
-          <span className="notification-badge">3</span>
-        </div>
-        <div className="nav-icon">
-          <FaEnvelope />
-          <span className="notification-badge">5</span>
-        </div>
+      
 
         <div
           className="user-profile"

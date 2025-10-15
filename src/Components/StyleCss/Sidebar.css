@@ -103,3 +103,43 @@
     width: 100%;
   }
 }
+
+
+.admin-sidebar.collapsed {
+  width: 70px;
+}
+
+.admin-sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-item.active {
+  background-color: #2563eb;
+  color: white;
+}
+
+.admin-icon {
+  font-size: 18px;
+  margin-right: 12px;
+  min-width: 25px;
+  text-align: center;
+}
+
+.admin-label {
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+.admin-sidebar.collapsed .admin-label {
+  display: none;
+}

@@ -1,0 +1,182 @@
+/* FinalVisaLeads.css */
+.final-visa-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+}
+
+.final-visa-header-card {
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  /* background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); */
+  color:black;
+}
+
+.final-visa-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.final-visa-title-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.final-visa-main-icon {
+  font-size: 2rem;
+}
+
+.final-visa-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.75rem;
+}
+
+.final-visa-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+}
+
+.final-visa-search-section {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.final-visa-search-input {
+  width: 100%;
+  max-width: 300px;
+  /* border-radius: 20px; */
+  padding-left: 2.5rem;
+}
+
+.final-visa-content-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.final-visa-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+}
+
+.final-visa-loading-text {
+  margin-top: 1rem;
+  color: #6c757d;
+}
+
+.final-visa-datatable {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.final-visa-datatable .p-datatable-thead > tr > th {
+  background: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 1rem;
+}
+
+.final-visa-datatable .p-datatable-tbody > tr > td {
+  padding: 0.75rem 1rem;
+}
+
+.final-visa-datatable .p-paginator {
+  padding: 0.75rem;
+}
+
+.final-visa-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.final-visa-view-btn, .final-visa-apply-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.final-visa-view-btn:hover {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.final-visa-apply-btn:hover {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+}
+
+.final-visa-toast {
+  font-family: inherit;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .final-visa-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .final-visa-search-section {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .final-visa-search-section h3{
+    color: black;
+  }
+  .final-visa-search-input {
+    max-width: 100%;
+  }
+  
+  .final-visa-title {
+    font-size: 1.5rem;
+  }
+  
+  .final-visa-action-buttons {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .final-visa-view-btn, .final-visa-apply-btn {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .final-visa-datatable .p-datatable-thead > tr > th,
+  .final-visa-datatable .p-datatable-tbody > tr > td {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .final-visa-container {
+    padding: 1rem;
+  }
+  
+  .final-visa-title-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .final-visa-main-icon {
+    font-size: 1.5rem;
+  }
+  
+  .final-visa-title {
+    font-size: 1.25rem;
+  }
+  
+  .final-visa-badge {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
